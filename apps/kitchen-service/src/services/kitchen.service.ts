@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '@libs/database';
 import { OrderStatus } from '@prisma/client';
+import { OrderStatusChangedEvent } from '@libs/contracts';
 
 @Injectable()
 export class KitchenService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(KitchenService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async getPendingOrders(restaurantId?: string) {
     return this.prisma.order.findMany({
@@ -57,23 +64,46 @@ export class KitchenService {
   }
 
   async startPreparing(orderId: string) {
-    return this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: { id: orderId },
       data: { status: OrderStatus.IN_PREPARATION },
     });
+
+    this.eventEmitter.emit(
+      'order.status.changed',
+      new OrderStatusChangedEvent(order.id, order.status, new Date()),
+    );
+
+    return order;
   }
 
   async markReady(orderId: string) {
-    return this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: { id: orderId },
       data: { status: OrderStatus.READY },
     });
+
+    this.eventEmitter.emit(
+      'order.status.changed',
+      new OrderStatusChangedEvent(order.id, order.status, new Date()),
+    );
+
+    return order;
   }
 
   async complete(orderId: string) {
-    return this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: { id: orderId },
       data: { status: OrderStatus.COMPLETED },
     });
+
+    this.eventEmitter.emit(
+      'order.status.changed',
+      new OrderStatusChangedEvent(order.id, order.status, new Date()),
+    );
+
+    this.logger.log(`Order ${orderId} completed`);
+
+    return order;
   }
 }
