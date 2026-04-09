@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qr-food-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: qr-food
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  menu-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: menu-service
+    container_name: qr-food-menu-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/qr-food
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: order-service
+    container_name: qr-food-order-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/qr-food
+      MENU_SERVICE_URL: http://menu-service:3001
+    ports:
+      - '3002:3002'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  kitchen-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: kitchen-service
+    container_name: qr-food-kitchen-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/qr-food
+    ports:
+      - '3003:3003'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  erp-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: erp-service
+    container_name: qr-food-erp-service
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/qr-food
+    ports:
+      - '3004:3004'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prisma-studio:
+    image: node:20-alpine
+    container_name: qr-food-prisma-studio
+    restart: 'no'
+    working_dir: /app
+    command: >
+      sh -c "npm install -g prisma && npx prisma studio --port 5555"
+    ports:
+      - '5555:5555'
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
