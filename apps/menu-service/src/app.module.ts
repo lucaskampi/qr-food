@@ -5,6 +5,7 @@ import { PrismaModule } from '@libs/database';
 import { RestaurantService } from './services/restaurant.service';
 import { CategoryService } from './services/category.service';
 import { MenuItemService } from './services/menu-item.service';
+import { RestaurantController } from './controllers/restaurant.controller';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MenuItemService } from './services/menu-item.service';
     CommonModule,
     PrismaModule,
   ],
+  controllers: [RestaurantController],
   providers: [RestaurantService, CategoryService, MenuItemService],
   exports: [RestaurantService, CategoryService, MenuItemService],
 })
