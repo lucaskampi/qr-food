@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '@libs/common';
 import { PrismaModule } from '@libs/database';
+import { KitchenService } from './services/kitchen.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { PrismaModule } from '@libs/database';
     CommonModule,
     PrismaModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [KitchenService],
+  exports: [KitchenService],
 })
 export class AppModule {}
