@@ -31,6 +31,7 @@
     "test:e2e": "jest --config ./apps/menu-service/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "ts-node apps/menu-service/prisma/seed.ts",
     "prisma:studio": "prisma studio",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
