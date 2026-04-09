@@ -32,10 +32,10 @@ export class OrderController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Create a new order with automatic price calculation' })
   @ApiResponse({ status: 201, type: OrderResponseDto })
   async create(@Body() dto: CreateOrderDto) {
-    return this.orderService.create(dto);
+    return this.orderService.createWithCalculation(dto);
   }
 
   @Get()
