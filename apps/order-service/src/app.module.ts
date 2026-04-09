@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '@libs/common';
 import { PrismaModule } from '@libs/database';
+import { EventsModule } from '@libs/events';
 import { HttpModule } from '@nestjs/axios';
 import { OrderService } from './services/order.service';
 import { OrderItemService } from './services/order-item.service';
@@ -16,6 +17,7 @@ import { QrController } from './controllers/qr.controller';
     }),
     CommonModule,
     PrismaModule,
+    EventsModule,
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,
