@@ -32,6 +32,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node apps/menu-service/prisma/seed.ts",
+    "prisma:seed:order": "ts-node apps/order-service/prisma/seed.ts",
     "prisma:studio": "prisma studio",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
