@@ -8,6 +8,7 @@ import { OrderService } from './services/order.service';
 import { OrderItemService } from './services/order-item.service';
 import { OrderController } from './controllers/order.controller';
 import { QrController } from './controllers/qr.controller';
+import { OrderListener } from './listeners/order.listener';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { QrController } from './controllers/qr.controller';
     }),
   ],
   controllers: [OrderController, QrController],
-  providers: [OrderService, OrderItemService],
+  providers: [OrderService, OrderItemService, OrderListener],
   exports: [OrderService, OrderItemService],
 })
 export class AppModule {}
