@@ -1,14 +1,19 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '@libs/database';
 import { Prisma, OrderStatus } from '@prisma/client';
 import { CreateOrderDto } from '@libs/contracts';
+import { OrderCreatedEvent } from '@libs/contracts';
 
 @Injectable()
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
   private readonly menuServiceUrl = process.env.MENU_SERVICE_URL || 'http://localhost:3001';
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async createWithCalculation(dto: CreateOrderDto) {
     const menuItemIds = dto.items.map((item) => item.menuItemId);
@@ -53,6 +58,23 @@ export class OrderService {
     });
 
     this.logger.log(`Order created: ${order.id} for table ${dto.tableId}`);
+
+    this.eventEmitter.emit(
+      'order.created',
+      new OrderCreatedEvent(
+        order.id,
+        order.restaurantId,
+        order.tableId,
+        order.orderItems.map((item) => ({
+          menuItemId: item.menuItemId,
+          name: item.menuItem.name,
+          quantity: item.quantity,
+          unitPrice: Number(item.unitPrice),
+        })),
+        Number(order.totalAmount),
+        order.createdAt,
+      ),
+    );
 
     return order;
   }
