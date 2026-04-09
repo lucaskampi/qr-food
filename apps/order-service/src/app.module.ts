@@ -4,6 +4,7 @@ import { CommonModule } from '@libs/common';
 import { PrismaModule } from '@libs/database';
 import { OrderService } from './services/order.service';
 import { OrderItemService } from './services/order-item.service';
+import { OrderController } from './controllers/order.controller';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { OrderItemService } from './services/order-item.service';
     CommonModule,
     PrismaModule,
   ],
+  controllers: [OrderController],
   providers: [OrderService, OrderItemService],
   exports: [OrderService, OrderItemService],
 })
