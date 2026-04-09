@@ -1,6 +1,6 @@
 # QR Food Service
 
-A microservices-based QR code restaurant menu & ordering system (inspired by Me&U style).
+A microservices-based QR code restaurant menu & ordering system.
 
 Customer scans a QR code on the table → sees the menu → places order → order is processed by the restaurant's ERP/CRM → kitchen preparation → billing.
 
